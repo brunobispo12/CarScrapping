@@ -1,11 +1,11 @@
 import type { Browser } from "puppeteer"
-import type { AdvertisementDTO } from "../entities/AdvertisementDTO"
-import type { StoreTransferDTO } from "../entities/StoreTransferDTO"
-import { getCurrentDateTime } from "../utils/get-current-date-time"
+import type { AdvertisementDTO } from "../../entities/AdvertisementDTO"
+import type { StoreTransferDTO } from "../../entities/StoreTransferDTO"
+import { getCurrentDateTime } from "../../utils/get-current-date-time"
 
 export async function execMottaAutomoveis(browser: Browser): Promise<StoreTransferDTO> {
     const page = await browser.newPage()
-    await page.goto("https://www.mottaautomoveis.com.br/estoque", { waitUntil: 'networkidle0' })
+    await page.goto("https://www.mottaautomoveis.com.br/estoque")
 
     const itemsData: AdvertisementDTO[] = await page.evaluate(() => {
         const items = Array.from(document.querySelectorAll("article > a"))

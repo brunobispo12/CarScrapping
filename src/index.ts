@@ -1,13 +1,13 @@
 import puppeteer from 'puppeteer';
-import { execMarketplace } from './marketplace';
 import fs from 'fs';
-import { execMottaAutomoveis } from './motta-automoveis';
+import { execMarketplace } from './stores/marketplace';
+import { execMottaAutomoveis } from './stores/motta-automoveis';
 
 async function run() {
     console.time('Total Execution Time');
 
     const cars = [
-        "",
+        "Peugeot 106",
     ];
 
     const browser = await puppeteer.launch({ headless: false, timeout: 30000000000000, protocolTimeout: 30000000000000, })
@@ -23,8 +23,11 @@ async function run() {
             resultsMarketplace.push(result)
         }
 
+        const mottaData = await execMottaAutomoveis(browser)
+
         const data = {
-            marketplace: resultsMarketplace
+            marketplace: resultsMarketplace,
+            motta: mottaData
         }
 
         const jsonData = JSON.stringify(data, null, 2)

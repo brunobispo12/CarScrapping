@@ -1,8 +1,8 @@
 import { Browser } from "puppeteer";
-import { autoScroll } from "../utils/autoscroll";
-import type { AdvertisementDTO } from "../entities/AdvertisementDTO";
-import { getCurrentDateTime } from "../utils/get-current-date-time";
-import type { StoreTransferDTO } from "../entities/StoreTransferDTO";
+import { autoScroll } from "../../utils/autoscroll";
+import type { AdvertisementDTO } from "../../entities/AdvertisementDTO";
+import { getCurrentDateTime } from "../../utils/get-current-date-time";
+import type { StoreTransferDTO } from "../../entities/StoreTransferDTO";
 
 export type MarketplaceConfig = {
     car_query: string
