@@ -5,7 +5,7 @@ import { getCurrentDateTime } from "../../utils/get-current-date-time"
 
 export async function execMottaAutomoveis(browser: Browser): Promise<StoreTransferDTO> {
     const page = await browser.newPage()
-    await page.goto("https://www.mottaautomoveis.com.br/estoque")
+    await page.goto("https://www.carrosnaserra.com.br/buscaDetalhada/1")
 
     const itemsData: AdvertisementDTO[] = await page.evaluate(() => {
         const items = Array.from(document.querySelectorAll("article > a"))
