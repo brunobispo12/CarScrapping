@@ -1,6 +1,8 @@
 import { Page } from "puppeteer";
+import { logger } from "./logger";
 
-export async function autoScroll(page: Page) {
+export async function AutoScroll(page: Page) {
+    logger('start', 'AutoScrolling')
     await page.evaluate(async () => {
         await new Promise<void>((resolve) => {
             let totalHeight = -1000;
@@ -14,7 +16,8 @@ export async function autoScroll(page: Page) {
                     clearInterval(timer);
                     resolve();
                 }
-            }, 350);
+            }, 500);
         });
     });
+    logger('success', 'AutoScrolling successfully')
 }
