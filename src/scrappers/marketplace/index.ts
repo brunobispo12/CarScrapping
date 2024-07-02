@@ -1,5 +1,5 @@
 import { Browser } from "puppeteer";
-import { autoScroll } from "../../utils/autoscroll";
+import { AutoScroll } from "../../utils/autoscroll";
 import type { AdvertisementDTO } from "../../entities/AdvertisementDTO";
 import { getCurrentDateTime } from "../../utils/get-current-date-time";
 import type { StoreTransferDTO } from "../../entities/StoreTransferDTO";
@@ -24,7 +24,7 @@ export async function execMarketplace({ car_query, min_price, browser }: Marketp
     await page.waitForSelector(selector);
     await page.click(selector);
 
-    await autoScroll(page);
+    await AutoScroll(page);
 
     const itemsData: AdvertisementDTO[] = await page.evaluate(() => {
         const items = Array.from(document.querySelectorAll('a.x1i10hfl.xjbqb8w.x1ejq31n.xd10rxx.x1sy0etr.x17r0tee.x972fbf.xcfux6l.x1qhh985.xm0m39n.x9f619.x1ypdohk.xt0psk2.xe8uvvx.xdj266r.x11i5rnm.xat24cr.x1mh8g0r.xexx8yu.x4uap5.x18d9i69.xkhd6sd.x16tdsg8.x1hl2dhg.xggy1nq.x1a2a7pz.x1heor9g.x1sur9pj.xkrqix3.x1lku1pv'));
@@ -36,7 +36,7 @@ export async function execMarketplace({ car_query, min_price, browser }: Marketp
             const image = item.querySelector("div.x78zum5.xdt5ytf.x1n2onr6 > div.x1n2onr6 > div.x1n2onr6.xh8yej3 > div.x1exxf4d.x1y71gwh.x1nb4dca.xu1343h.xhk9q7s.x1otrzb0.x1i1ezom.x1o6z2jb.x13fuv20.xu3j5b3.x1q0q8m5.x26u7qi.x178xt8z.xm81vs4.xso031l.xy80clv.x1ey2m1c.xds687c.x6ikm8r.x10wlt62.x1n2onr6.x17qophe.x13vifvy > div.xhk9q7s.x1otrzb0.x1i1ezom.x1o6z2jb.x6ikm8r.x10wlt62.x1vrad04.x1n2onr6.xh8yej3 > div.x78zum5.x1a02dak.x1c0ccdx.x10l6tqk.xzadtn0.x1pdr0v7.x9s46ru > div.x9f619.x78zum5.x1iyjqo2.x5yr21d.x4p5aij.x19um543.x1j85h84.x1m6msm.x1n2onr6.xh8yej3 > img ")?.getAttribute('src') ?? 'Imagem não encontrada'
             const link = baseURL + baselink
             const store = "Marketplace"
-            return { price, name, location, link, store, image };
+            return { price, name, location, link, store, image, year: "Ano não econtrado", km: "Km não encontrado", brand: "Renault" };
         });
     });
 
