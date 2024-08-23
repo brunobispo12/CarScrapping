@@ -8,4 +8,5 @@ export type AdvertisementDTO = {
     link: string
     store: string
     brand: string
+    createdAt: string
 }

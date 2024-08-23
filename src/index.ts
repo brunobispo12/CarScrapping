@@ -1,46 +1,32 @@
-import puppeteer from 'puppeteer';
+import puppeteer, { Browser } from 'puppeteer';
 import fs from 'fs';
-import { execMarketplace } from './stores/marketplace';
-import { execMottaAutomoveis } from './stores/motta-automoveis';
+import { browserConfig } from './config/browser';
+import { execMarketplace, type MarketplaceConfig } from './scrappers/marketplace';
+import { carBrands } from './config/car-brands';
+import type { AdvertisementDTO } from './entities/AdvertisementDTO';
+import { execCarrosNaSerra } from './scrappers/carros-na-serra';
+import execOlx from './scrappers/olx';
 
-async function run() {
+async function run(): Promise<void> {
     console.time('Total Execution Time');
 
-    const cars = [
-        "Peugeot 106",
-    ];
-
-    const browser = await puppeteer.launch({ headless: false, timeout: 30000000000000, protocolTimeout: 30000000000000, })
-    const resultsMarketplace = []
+    const browser: Browser = await puppeteer.launch(browserConfig);
+    const allResults: AdvertisementDTO[] = [];
 
     try {
-        for (const car of cars) {
-            const result = await execMarketplace({
-                car_query: car,
-                min_price: '5000',
-                browser: browser
-            });
-            resultsMarketplace.push(result)
-        }
 
-        const mottaData = await execMottaAutomoveis(browser)
+        const olx = await execOlx(browser)
+        allResults.push(...olx)
 
-        const data = {
-            marketplace: resultsMarketplace,
-            motta: mottaData
-        }
-
-        const jsonData = JSON.stringify(data, null, 2)
-
-        fs.writeFileSync('output.json', jsonData, 'utf8')
-        console.log('Dados salvos em output.json')
+        const jsonData = JSON.stringify(allResults, null, 2);
+        fs.writeFileSync('outputTesteCarros4.json', jsonData, 'utf8');
 
     } catch (error) {
-        console.error('Erro ao executar a função run:', error)
+        console.error('Erro ao executar a função run:', error);
     } finally {
-        await browser.close()
-        console.timeEnd('Total Execution Time')
+        await browser.close();
+        console.timeEnd('Total Execution Time');
     }
 }
 
-await run();
+run();

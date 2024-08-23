@@ -16,7 +16,7 @@ export async function AutoScroll(page: Page) {
                     clearInterval(timer);
                     resolve();
                 }
-            }, 500);
+            }, 700);
         });
     });
     logger('success', 'AutoScrolling successfully')

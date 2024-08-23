@@ -4,21 +4,14 @@ import type { Browser } from "puppeteer";
 import { logger } from "../../utils/logger";
 import { generateRandomUA } from "../../utils/random-ua-generator";
 import type { AdvertisementDTO } from "../../entities/AdvertisementDTO";
+import { getCurrentDateTime } from "../../utils/get-current-date-time";
 
 export async function execCarrosNaSerra(browser: Browser): Promise<AdvertisementDTO[]> {
     logUpdate(chalk.yellow("[0/?] Starting execCarrosNaSerra"));
 
-    const page = await browser.newPage();
-    await page.setUserAgent(generateRandomUA());
-
-    logger('start', '[3/?] Entering https://www.carrosnaserra.com.br');
-    await page.goto("https://www.carrosnaserra.com.br/capa", { waitUntil: 'networkidle2' });
-    logger('success', '[3/?] Entered https://www.carrosnaserra.com.br');
-
     const categorias = ['CARROS'];
     const intervalos = [
         { min: 3000, max: 10000 },
-        // Descomente os intervalos conforme necessário
         { min: 10000, max: 20000 },
         { min: 20000, max: 30000 },
         { min: 30000, max: 40000 },
@@ -30,15 +23,20 @@ export async function execCarrosNaSerra(browser: Browser): Promise<Advertisement
         { min: 90000, max: 100000 },
         { min: 100000, max: 150000 },
         { min: 150000, max: 200000 },
-        { min: 200000, max: 10000000 }
+        { min: 200000, max: 9999999 }
     ];
 
     const result: AdvertisementDTO[] = [];
 
-    for (const categoria of categorias) {
-        for (const intervalo of intervalos) {
-            logger('info', `[?/?] Searching ${categoria} from R$ ${intervalo.min} to R$ ${intervalo.max}`);
+    const processInterval = async (intervalo: { min: number, max: number }) => {
+        const page = await browser.newPage();
+        await page.setUserAgent(generateRandomUA());
 
+        logger('start', `[3/?] Entering https://www.carrosnaserra.com.br for range R$ ${intervalo.min} to R$ ${intervalo.max}`);
+        await page.goto("https://www.carrosnaserra.com.br/capa", { waitUntil: 'networkidle2' });
+        logger('success', `[3/?] Entered https://www.carrosnaserra.com.br for range R$ ${intervalo.min} to R$ ${intervalo.max}`);
+
+        for (const categoria of categorias) {
             await page.select('select[name="categoria"]', categoria);
 
             await page.$eval('input[name="de"]', el => el.value = '');
@@ -52,7 +50,8 @@ export async function execCarrosNaSerra(browser: Browser): Promise<Advertisement
             ]);
 
             do {
-                const anuncios = await page.evaluate(() => {
+                const currentDateTime = getCurrentDateTime();
+                const anuncios = await page.evaluate(({ currentDateTime }) => {
                     const items = Array.from(document.querySelectorAll("a > div.estoque-card"));
                     return items.map(item => {
                         const name = item.querySelector("div.modelo-estoque-card")?.textContent?.trim() ?? 'Nome não informado';
@@ -77,11 +76,9 @@ export async function execCarrosNaSerra(browser: Browser): Promise<Advertisement
                         location = location.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')
                         const image = item.querySelector("div.box-img-card > img")?.getAttribute('src') ?? 'Imagem não informada';
                         const store = "Carros na Serra";
-                        return { brand: brand, name: `${brand} ${name}`, price, link: fullLink, location, store, image, year, km };
+                        return { brand: brand, name: `${brand} ${name}`, price, link: fullLink, location, store, image, year, km, createdAt: currentDateTime };
                     });
-                });
-
-                console.log(anuncios);
+                }, { currentDateTime });
 
                 result.push(...anuncios);
 
@@ -104,7 +101,11 @@ export async function execCarrosNaSerra(browser: Browser): Promise<Advertisement
                 }
             } while (true); // Loop infinito, sai apenas pelo 'break'
         }
-    }
+
+        await page.close();
+    };
+
+    await Promise.all(intervalos.map(intervalo => processInterval(intervalo)));
 
     logger('done', 'execCarrosNaSerra finished successfully');
     console.log(result);
